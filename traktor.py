@@ -1,3 +1,4 @@
+from traktor_nml_utils import TraktorCollection
 import uuid
 from data import Playlist
 import xml.etree.ElementTree as ET
@@ -63,6 +64,9 @@ def path_to_traktor_formatted_path(path : Path, volume):
         return volume
     return path_to_traktor_formatted_path(path.parent, volume) + "/:" + path.name
 
+def traktor_path_to_pathlib_path(traktor_dir, traktor_name) -> Path:
+    return Path(traktor_dir.replace("/:", "/")).joinpath(traktor_name)
+
 def create_or_replace_custom_playlists(playlist_root, folder_name, playlists, volume):
     remove_custom_playlist_folder(playlist_root, folder_name)
     playlist_root.insert(0, fresh_playlist_node(folder_name, playlists, volume))
@@ -79,3 +83,15 @@ def write_custom_playlists_to_traktor_collection(
                                        playlists,
                                        volume)
     collection.write(collection_nml)
+
+def write_rating_to_traktor_collection(
+        collection_nml,
+        path_to_rating_dict
+):
+    collection = TraktorCollection(collection_nml)
+    for t in collection.entries:
+        path = str(traktor_path_to_pathlib_path(t.dir, t.file))
+        if path in path_to_rating_dict:
+            t.ranking = 51 * path_to_rating_dict[path]
+            print("RANKING %s for %s" % (t.ranking, path))
+            t.save()

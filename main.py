@@ -3,6 +3,7 @@ import json
 from constants import DEFAULT_PATH_FOR_JSON_FILE
 import traktor
 import playlist_reader
+import beets_manager
 
 
 if __name__ == "__main__":
@@ -19,6 +20,7 @@ if __name__ == "__main__":
     folder_name = config.get("folderName")
     traktor_collection = config.get("traktor")
     playlists_dir = config.get("playlistsDir")
+    beets_db = config.get("beetsLibrary")
 
     print(json.dumps(config, indent=4))
 
@@ -31,6 +33,14 @@ if __name__ == "__main__":
         playlists,
         volume,
         folder_name
+    )
+
+    print("Writing ratings to Traktor")
+    ratings_by_path = beets_manager.get_rating_by_file_dict(beets_db)
+    print("Found %s ratings in beets db" % len(ratings_by_path))
+    traktor.write_rating_to_traktor_collection(
+        traktor_collection,
+        ratings_by_path
     )
 
     print("Done !")
