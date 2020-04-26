@@ -35,13 +35,20 @@ if __name__ == "__main__":
         folder_name
     )
 
-    print("Writing ratings to Traktor")
-    ratings_by_path = beets_manager.get_rating_by_file_dict(beets_db)
-    print("Found %s ratings in beets db" % len(ratings_by_path))
-    traktor.write_rating_to_traktor_collection(
-        traktor_collection,
-        ratings_by_path
-    )
+    if "beet_export_only" not in sys.argv:
+        print("Writing rating to beets")
+        traktor_ratings_by_path = traktor.get_paths_to_rating_dict(traktor_collection)
+        print("Found %s ratings in traktor" % len(traktor_ratings_by_path))
+        beets_manager.write_ratings(beets_db, traktor_ratings_by_path)
+
+    if "traktor_export_only" not in sys.argv:
+        print("Writing ratings to Traktor")
+        beets_ratings_by_path = beets_manager.get_rating_by_file_dict(beets_db)
+        print("Found %s ratings in beets db" % len(beets_ratings_by_path))
+        traktor.write_rating_to_traktor_collection(
+            traktor_collection,
+            beets_ratings_by_path
+        )
 
     print("Done !")
 
