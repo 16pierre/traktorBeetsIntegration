@@ -3,5 +3,7 @@
     "volume": "Macintosh HD",
     "folderName": "aaaSmartPlaylists",
     "playlistsDir": "/Users/16pierre/Music/smartPlaylists",
-    "beetsLibrary": "/Users/16pierre/beets/musiclibrary.db"
+    "beetsLibrary": "/Users/16pierre/beets/musiclibrary.db",
+    "beetsConfigTemplate": "/Users/16pierre/beets/config.template.yaml",
+    "beetsConfigGenerated": "/Users/16pierre/beets/config.yaml"
 }

@@ -1,0 +1,20 @@
+{
+    "_playlists": [
+        ["genre2"],
+        ["lead"],
+        ["rating"],
+        ["mood"],
+        ["genre2", "energy"],
+        ["genre2", "vocal"],
+        ["genre2", "lead"],
+        ["genre2", "mood"],
+        ["genre2", "mood", "energy"]
+    ],
+    "energy": [1, 2, 3, 4, 5],
+    "rating": [1, 2, 3, 4, 5],
+    "vocal": ["yes", "no"],
+    "lead": ["vocal", "drums", "synth", "piano", "sax", "bass"],
+    "mood": ["joyful", "dark", "chill", "futurist"],
+    "genre2": ["Funk", "Disco", "House", "Tech House",
+        "Techno", "Acid", "Dance", "Hip Hop", "Rap"]
+}
