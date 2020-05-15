@@ -33,6 +33,8 @@ def _prompt_for_track(track, tags):
             user_input = input("Tag %s ? Values: %s" % (tag, values))
             if user_input == "" or user_input is None:
                 loop = False
+            if user_input.lower() == "skip":
+                return
             identified_value = _identify_value(user_input, values)
             if identified_value is not None:
                 print(identified_value)
@@ -48,6 +50,9 @@ def _identify_value(user_input, values):
         except Exception:
             return None
     else:
+        values = [v.lower() for v in values]
+        if user_input.lower() in values:
+            return user_input
         compatible_values = [v for v in values
                              if _are_strings_compatible(user_input, v)]
         if len(compatible_values) == 1:
