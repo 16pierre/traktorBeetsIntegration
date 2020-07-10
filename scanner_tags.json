@@ -1,17 +1,13 @@
 {
     "_playlists": [
-        ["genre2"],
+        ["genre"],
         ["scratch"],
         ["lead"],
         ["rating"],
         ["mood"],
         ["energy"],
-        ["mood", "energy"],
         ["genre2", "energy"],
-        ["genre2", "vocal"],
-        ["genre2", "lead"],
-        ["genre2", "mood"],
-        ["genre2", "mood", "energy"]
+        ["genre2", "mood"]
     ],
     "energy": [1, 2, 3, 4, 5],
     "rating": [1, 2, 3, 4, 5],
