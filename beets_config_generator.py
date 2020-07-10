@@ -41,7 +41,7 @@ def _next_tags_to_values(
 
 def _playlist_name(tags_info, index, tags_to_values_dict):
     tags_initials = "".join([k[0] for k in tags_info["_playlists"][index]])
-    return ("%s_%s %s" % (index + 1, tags_initials, _query(tags_to_values_dict).replace(":", "="))).strip()
+    return ("%02d_%s %s" % (index + 1, tags_initials, _query(tags_to_values_dict).replace(":", "="))).strip()
 
 
 def _query(tags_to_values_dict):
