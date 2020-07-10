@@ -51,6 +51,7 @@ def _identify_value(user_input, values):
             return None
     else:
         values = [v.lower() for v in values]
+        # TODO: Case sensitive, identified value should have the right case
         if user_input.lower() in values:
             return user_input
         compatible_values = [v for v in values
