@@ -50,14 +50,17 @@ def _identify_value(user_input, values):
         except Exception:
             return None
     else:
-        values = [v.lower() for v in values]
-        # TODO: Case sensitive, identified value should have the right case
-        if user_input.lower() in values:
-            return user_input
-        compatible_values = [v for v in values
+        user_input = user_input.lower()
+        lowercase_values = [v.lower() for v in values]
+        try:
+            found = lowercase_values.index(user_input)
+            return values[found]
+        except:
+            ...
+        compatible_values = [v for v in lowercase_values
                              if _are_strings_compatible(user_input, v)]
         if len(compatible_values) == 1:
-            return compatible_values[0]
+            return values[lowercase_values.index(compatible_values[0])]
         return None
 
 def _are_strings_compatible(compressed, original):
