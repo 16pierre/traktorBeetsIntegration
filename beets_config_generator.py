@@ -5,6 +5,7 @@ from constants import *
 with open(SCANNER_TAGS_FILE) as json_file:
     TAGS_MODEL = json.load(json_file)
 
+# TODO: Don't re-write new smartPlaylist in YAML, this kills existing config
 
 _FORMAT_NAME    = "    - name: %s.m3u\n"
 _FORMAT_QUERY   = "      query: %s\n"
@@ -47,7 +48,7 @@ def _playlist_name(tags_info, index, tags_to_values_dict):
 def _query(tags_to_values_dict):
     query = ""
     for k, v in tags_to_values_dict.items():
-        query += "%s:%s " % (k, v)
+        query += "%s:'%s' " % (k, v)
     return query
 
 
