@@ -92,11 +92,45 @@ def write_rating_to_traktor_collection(
     for t in collection.entries:
         path = str(traktor_path_to_pathlib_path(t.dir, t.file))
 
+        # print(":".join("{:02x}".format(ord(c)) for c in path))
+
         if path in path_to_rating_dict:
             t.ranking = 51 * path_to_rating_dict[path]
             if t.ranking == 0:
                 t.ranking = 51
             t.save()
+
+def write_comments_to_traktor_collection(
+        collection_nml,
+        path_to_tags_dict,
+        tags_list
+):
+    collection = TraktorCollection(collection_nml)
+    for t in collection.entries:
+        path = str(traktor_path_to_pathlib_path(t.dir, t.file))
+
+        if path in path_to_tags_dict:
+            t.comment = _tags_to_comment(path_to_tags_dict[path], tags_list)
+            t.save()
+
+def _tags_to_comment(track_tags, tags_list):
+    result = ""
+    for tag in tags_list:
+        tag_value = track_tags.get(tag)
+        if tag_value is not None and tag_value != "":
+            if tag_value == "yes":
+                result += "%s - " % tag
+            # elif tag_value == "no":
+            #     result += "!%s - " % tag
+            else:
+                try:
+                    to_int = int(float(tag_value))
+                    result += "%s: %d -" % (tag, to_int)
+                except Exception:
+                    result += "%s - " % tag_value
+    if len(result) >= 2:
+        return result[:-2]
+    return ""
 
 def get_paths_to_rating_dict(
         collection_nml
