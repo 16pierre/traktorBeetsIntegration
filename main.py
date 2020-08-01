@@ -4,6 +4,7 @@ from constants import DEFAULT_PATH_FOR_JSON_FILE
 import traktor
 import playlist_reader
 import beets_manager
+import beets_config_generator
 
 
 if __name__ == "__main__":
@@ -23,6 +24,9 @@ if __name__ == "__main__":
     beets_db = config.get("beetsLibrary")
 
     print(json.dumps(config, indent=4))
+
+    print("Writing beet config...")
+    beets_config_generator.write_config(config_path)
 
     playlists = playlist_reader.list_playlists_at_path(playlists_dir)
     print("Found %s playlists in %s: %s" % (len(playlists), playlists_dir, [p.name for p in playlists]))
@@ -44,6 +48,19 @@ if __name__ == "__main__":
     if "traktor_export_only" not in sys.argv:
         print("Writing ratings to Traktor")
         beets_ratings_by_path = beets_manager.get_rating_by_file_dict(beets_db)
+
+        not_in_traktor = list()
+        for p in beets_ratings_by_path:
+            if p not in traktor_ratings_by_path:
+                not_in_traktor.append(p)
+        not_in_beets = list()
+        for p in traktor_ratings_by_path:
+            if p not in beets_ratings_by_path:
+                not_in_beets.append(p)
+        print("Not in traktor: %s" % not_in_traktor)
+        print("=========================")
+        print("Not in beets: %s" % not_in_beets)
+
         print("Found %s ratings in beets db" % len(beets_ratings_by_path))
         traktor.write_rating_to_traktor_collection(
             traktor_collection,

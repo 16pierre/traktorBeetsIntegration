@@ -52,13 +52,7 @@ def _query(tags_to_values_dict):
     return query
 
 
-if __name__ == "__main__":
-
-    if len(sys.argv) < 2:
-        config_path = DEFAULT_PATH_FOR_JSON_FILE
-    else:
-        config_path = sys.argv[1]
-
+def write_config(config_path):
     with open(config_path) as json_file:
         config = json.load(json_file)
 
@@ -76,3 +70,14 @@ if __name__ == "__main__":
                     fout.write(line)
 
     print("Done !")
+
+
+if __name__ == "__main__":
+
+    if len(sys.argv) < 2:
+        config_path = DEFAULT_PATH_FOR_JSON_FILE
+    else:
+        config_path = sys.argv[1]
+
+    write_config(config_path)
+

@@ -1,4 +1,5 @@
 from beets.library import Library
+import unidecode
 
 
 def get_rating_by_file_dict(db_file):
@@ -8,7 +9,10 @@ def get_rating_by_file_dict(db_file):
         try:
             rating = int(float(i.rating))
             if rating >= 0 and rating <= 5:
-                result[str(i.path, 'utf-8')] = int(float(i.rating))
+                path = str(i.path, 'utf-8')
+                path = path.encode('ascii')
+                path = path.decode("utf-8")
+                result[path] = int(float(i.rating))
         except Exception as e:
             continue
     return result

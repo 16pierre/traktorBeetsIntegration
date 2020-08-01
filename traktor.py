@@ -91,8 +91,11 @@ def write_rating_to_traktor_collection(
     collection = TraktorCollection(collection_nml)
     for t in collection.entries:
         path = str(traktor_path_to_pathlib_path(t.dir, t.file))
+
         if path in path_to_rating_dict:
             t.ranking = 51 * path_to_rating_dict[path]
+            if t.ranking == 0:
+                t.ranking = 51
             t.save()
 
 def get_paths_to_rating_dict(
