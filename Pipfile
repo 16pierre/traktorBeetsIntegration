@@ -1,0 +1,18 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+
+[packages]
+beets = "*"
+traktor-nml-utils = "*"
+Unidecode = "*"
+
+[requires]
+python_version = "3.8"
+
+[scripts]
+scan = "python scanner.py"
+sync = "python main.py"
