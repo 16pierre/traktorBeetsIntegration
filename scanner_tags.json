@@ -13,7 +13,7 @@
     "rating": [1, 2, 3, 4, 5],
     "mood": ["joyful", "dark", "chill", "futurist", "energy", "nostalgy"],
     "loop": ["yes", "no"],
-    "genre2": ["Funk", "Disco", "House", "Tech House", "Minimal", "Deep House", "Tropical", "Glitch", "Jungle", "Big room",
+    "genre2": ["Soul", "Funk", "Disco", "House", "Tech House", "Minimal", "Deep House", "Tropical", "Glitch", "Jungle", "Big room",
                "Techno", "Acid", "Dance", "Hip Hop", "Rap", "Dubstep", "Progressive", "RokTek", "Chillax", "Ghetto", "Psy", "Trance"],
     "vocal": ["yes", "no"],
     "lead": ["vocal", "drums", "synth", "piano", "sax", "bass", "chords"],
