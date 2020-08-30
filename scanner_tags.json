@@ -1,5 +1,6 @@
 {
     "_playlists": [
+        ["susu"],
         ["genre2"],
         ["scratch"],
         ["lead"],
@@ -17,5 +18,6 @@
                "Techno", "Acid", "Dance", "Hip Hop", "Rap", "Dubstep", "Progressive", "RokTek", "Chillax", "Ghetto", "Psy", "Trance"],
     "vocal": ["yes", "no"],
     "lead": ["vocal", "drums", "synth", "piano", "sax", "bass", "chords"],
-    "scratch": ["yes", "no"]
+    "scratch": ["yes", "no"],
+    "susu": ["yes", "no"]
 }
