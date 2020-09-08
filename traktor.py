@@ -133,11 +133,14 @@ def _tags_to_comment(track_tags, tags_list):
     return ""
 
 def get_paths_to_rating_dict(
-        collection_nml
+        collection_nml,
+        volume
 ):
     result = dict()
     collection = TraktorCollection(collection_nml)
     for t in collection.entries:
+        if t.volume != volume:
+            continue
         if not t.ranking:
             continue
         path = str(traktor_path_to_pathlib_path(t.dir, t.file))
