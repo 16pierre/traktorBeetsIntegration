@@ -6,9 +6,12 @@ import playlist_reader
 import beets_manager
 import beets_config_generator
 import scanner
+import time
 
 
 if __name__ == "__main__":
+
+    start_time = time.time()
 
     if len(sys.argv) < 2:
         config_path = DEFAULT_PATH_FOR_JSON_FILE
@@ -81,5 +84,8 @@ if __name__ == "__main__":
 
     # TODO: GENERER COMMENT
     print("Done !")
+
+    elapsed_time = time.time() - start_time
+    print('Execution time : %.3f' % elapsed_time)
 
 

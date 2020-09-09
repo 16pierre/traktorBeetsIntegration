@@ -98,7 +98,8 @@ def write_rating_to_traktor_collection(
             t.ranking = 51 * path_to_rating_dict[path]
             if t.ranking == 0:
                 t.ranking = 51
-            t.save()
+
+    _save_collection(collection)
 
 def write_comments_to_traktor_collection(
         collection_nml,
@@ -111,7 +112,8 @@ def write_comments_to_traktor_collection(
 
         if path in path_to_tags_dict:
             t.comment = _tags_to_comment(path_to_tags_dict[path], tags_list)
-            t.save()
+
+    _save_collection(collection)
 
 def _tags_to_comment(track_tags, tags_list):
     result = ""
@@ -131,6 +133,11 @@ def _tags_to_comment(track_tags, tags_list):
     if len(result) >= 2:
         return result[:-2]
     return ""
+
+
+def _save_collection(collection_obj):
+    collection_obj.entries[0].save()  # HACK HACK: Saves all
+
 
 def get_paths_to_rating_dict(
         collection_nml,
