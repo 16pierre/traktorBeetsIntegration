@@ -7,7 +7,7 @@ verify_ssl = true
 
 [packages]
 beets = "*"
-traktor-nml-utils = "*"
+traktor-nml-utils = "==2.0.6"
 Unidecode = "*"
 
 [requires]

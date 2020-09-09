@@ -1,6 +1,7 @@
 from traktor_nml_utils import TraktorCollection
 import uuid
 from data import Playlist
+from pathlib import Path
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
@@ -88,16 +89,16 @@ def write_rating_to_traktor_collection(
         collection_nml,
         path_to_rating_dict
 ):
-    collection = TraktorCollection(collection_nml)
-    for t in collection.entries:
-        path = str(traktor_path_to_pathlib_path(t.dir, t.file))
+    collection = TraktorCollection(Path(collection_nml))
+    for t in collection.nml.collection.entry:
+        path = str(traktor_path_to_pathlib_path(t.location.dir, t.location.file))
 
         # print(":".join("{:02x}".format(ord(c)) for c in path))
 
         if path in path_to_rating_dict:
-            t.ranking = 51 * path_to_rating_dict[path]
-            if t.ranking == 0:
-                t.ranking = 51
+            t.info.ranking = 51 * path_to_rating_dict[path]
+            if t.info.ranking == 0:
+                t.info.ranking = 51
 
     _save_collection(collection)
 
@@ -106,9 +107,9 @@ def write_comments_to_traktor_collection(
         path_to_tags_dict,
         tags_list
 ):
-    collection = TraktorCollection(collection_nml)
-    for t in collection.entries:
-        path = str(traktor_path_to_pathlib_path(t.dir, t.file))
+    collection = TraktorCollection(Path(collection_nml))
+    for t in collection.nml.collection.entry:
+        path = str(traktor_path_to_pathlib_path(t.location.dir, t.location.file))
 
         if path in path_to_tags_dict:
             t.comment = _tags_to_comment(path_to_tags_dict[path], tags_list)
@@ -136,7 +137,7 @@ def _tags_to_comment(track_tags, tags_list):
 
 
 def _save_collection(collection_obj):
-    collection_obj.entries[0].save()  # HACK HACK: Saves all
+    collection_obj.save()
 
 
 def get_paths_to_rating_dict(
@@ -144,13 +145,13 @@ def get_paths_to_rating_dict(
         volume
 ):
     result = dict()
-    collection = TraktorCollection(collection_nml)
-    for t in collection.entries:
-        if t.volume != volume:
+    collection = TraktorCollection(Path(collection_nml))
+    for t in collection.nml.collection.entry:
+        if t.location.volume != volume:
             continue
-        if not t.ranking:
+        if not t.info.ranking:
             continue
-        path = str(traktor_path_to_pathlib_path(t.dir, t.file))
-        result[path] = t.ranking / 51
+        path = str(traktor_path_to_pathlib_path(t.location.dir, t.location.file))
+        result[path] = t.info.ranking / 51
     return result
 
