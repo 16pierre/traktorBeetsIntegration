@@ -27,8 +27,8 @@ if __name__ == "__main__":
     beets_db = config.get("beetsLibrary")
 
     # Smart playlist plugin
-    beet_smart_playlist_path = config.get("beetSmartPlaylistsPath")
-    beet_smart_playlist_directory_name = config.get("beetSmartPlaylistDirectoryName")
+    beet_smart_playlist_path = config.get("m3uPath")
+    beet_smart_playlist_directory_name = config.get("m3uDirectoryName")
 
     print(json.dumps(config, indent=4))
 
