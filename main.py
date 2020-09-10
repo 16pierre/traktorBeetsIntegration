@@ -2,7 +2,7 @@ import sys
 import json
 from constants import DEFAULT_PATH_FOR_JSON_FILE
 import traktor
-import playlist_reader
+import m3u_playlist_reader
 import beets_manager
 import beets_config_generator
 import scanner
@@ -22,25 +22,29 @@ if __name__ == "__main__":
         config = json.load(json_file)
 
     volume = config.get("volume")
-    folder_name = config.get("folderName")
+
     traktor_collection = config.get("traktor")
-    playlists_dir = config.get("playlistsDir")
     beets_db = config.get("beetsLibrary")
+
+    # Smart playlist plugin
+    beet_smart_playlist_path = config.get("beetSmartPlaylistsPath")
+    beet_smart_playlist_directory_name = config.get("beetSmartPlaylistDirectoryName")
 
     print(json.dumps(config, indent=4))
 
     print("Writing beet config...")
     beets_config_generator.write_config(config_path)
 
-    playlists = playlist_reader.list_playlists_at_path(playlists_dir)
-    print("Found %s playlists in %s: %s" % (len(playlists), playlists_dir, [p.name for p in playlists]))
+    beet_smart_playlists = m3u_playlist_reader.list_playlists_at_path(beet_smart_playlist_path)
+    print("Found %s beet smart playlists in %s: %s" %
+          (len(beet_smart_playlists), beet_smart_playlist_path, [p.name for p in beet_smart_playlists]))
 
-    print("Writing playlists to Traktor %s playlist folder" % folder_name)
+    print("Writing beet smart playlists to Traktor %s playlist folder" % beet_smart_playlist_directory_name)
     traktor.write_auto_generated_playlists_to_traktor(
         traktor_collection,
-        playlists,
+        beet_smart_playlists,
         volume,
-        folder_name
+        beet_smart_playlist_directory_name
     )
 
     traktor_ratings_by_path = traktor.get_paths_to_rating_dict(traktor_collection, volume)
@@ -50,11 +54,11 @@ if __name__ == "__main__":
     print("Found %s ratings in beets" % len(beets_ratings_by_path))
 
     if "beet_export_only" not in sys.argv:
-        print("=== Exporting to beets ===")
+        print("=== Exporting ratings to beets ===")
         beets_manager.write_ratings(beets_db, traktor_ratings_by_path)
 
     if "traktor_export_only" not in sys.argv:
-        print("=== Exporting to Traktor ===")
+        print("=== Exporting ratings to Traktor ===")
         beets_tags = beets_manager.get_tags_by_file_dict(beets_db, scanner.TAGS_MODEL.keys())
 
         not_in_traktor = list()
@@ -65,11 +69,10 @@ if __name__ == "__main__":
         for p in traktor_ratings_by_path:
             if p not in beets_ratings_by_path:
                 not_in_beets.append(p)
-        print("Not in traktor: %s" % not_in_traktor)
+        print("Ratings not in traktor: %s" % not_in_traktor)
         print("---------------------------")
-        print("Not in beets: %s" % not_in_beets)
+        print("Ratings not in beets: %s" % not_in_beets)
 
-        print("Found %s ratings in beets db" % len(beets_ratings_by_path))
         traktor.write_rating_to_traktor_collection(
             traktor_collection,
             beets_ratings_by_path
@@ -82,7 +85,6 @@ if __name__ == "__main__":
             scanner.TAGS_MODEL.keys()
         )
 
-    # TODO: GENERER COMMENT
     print("Done !")
 
     elapsed_time = time.time() - start_time

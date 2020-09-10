@@ -1,8 +1,8 @@
 {
     "traktor": "/Users/16pierre/Documents/Native Instruments/Traktor 3.3.0/collection.nml",
     "volume": "Macintosh HD",
-    "folderName": "aaaSmartPlaylists",
-    "playlistsDir": "/Users/16pierre/Music/smartPlaylists",
+    "beetSmartPlaylistDirectoryName": "aaBeetSmartPlaylists",
+    "beetSmartPlaylistsPath": "/Users/16pierre/Music/smartPlaylists",
     "beetsLibrary": "/Users/16pierre/beets/musiclibrary.db",
     "beetsConfigTemplate": "/Users/16pierre/beets/config.template.yaml",
     "beetsConfigGenerated": "/Users/16pierre/beets/config.yaml"
