@@ -16,3 +16,4 @@ python_version = "3.8"
 [scripts]
 scan = "python scanner.py"
 sync = "python main.py"
+import = "python import_utils.py"
