@@ -2,6 +2,7 @@ from beets.library import Library
 from constants import DEFAULT_PATH_FOR_JSON_FILE
 import json
 import sys
+import utils
 from constants import *
 
 with open(SCANNER_TAGS_FILE) as json_file:
@@ -35,47 +36,11 @@ def _prompt_for_track(track, tags):
                 loop = False
             if user_input.lower() == "skip":
                 return
-            identified_value = _identify_value(user_input, values)
+            identified_value = utils.identify_value(user_input, values)
             if identified_value is not None:
                 print(identified_value)
                 loop = False
                 setattr(track, tag, identified_value)
-
-def _identify_value(user_input, values):
-    if isinstance(values[0], int):
-        try:
-            parsed_input = int(user_input)
-            if parsed_input in values:
-                return parsed_input
-        except Exception:
-            return None
-    else:
-        user_input = user_input.lower()
-        lowercase_values = [v.lower() for v in values]
-        try:
-            found = lowercase_values.index(user_input)
-            return values[found]
-        except:
-            ...
-        compatible_values = [v for v in lowercase_values
-                             if _are_strings_compatible(user_input, v)]
-        if len(compatible_values) == 1:
-            return values[lowercase_values.index(compatible_values[0])]
-        return None
-
-def _are_strings_compatible(compressed, original):
-    compressed = compressed.lower()
-    original = original.lower()
-    if len(compressed) <= 0:
-        return True
-    if len(original) <= 0:
-        return False
-    s = compressed[0]
-    try:
-        index = original.index(s)
-        return _are_strings_compatible(compressed[1:], original[index+1:])
-    except Exception:
-        return False
 
 
 if __name__ == "__main__":
