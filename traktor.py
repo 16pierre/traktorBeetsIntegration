@@ -1,7 +1,7 @@
 from traktor_nml_utils import TraktorCollection
 import traktor_nml_utils.models.collection as TraktorModels
-from typing import Type, List
-from data import Playlist
+from typing import List, Dict
+from data import Playlist, Track
 from pathlib import Path
 
 
@@ -50,7 +50,7 @@ def create_playlist_directory(node : TraktorModels.Nodetype, name : str) -> Trak
     return created_node
 
 
-def create_playlist(node: TraktorModels.Nodetype, name: str, volume: str, tracks: List[Path]) -> TraktorModels.Nodetype:
+def create_playlist(node: TraktorModels.Nodetype, name: str, volume: str, tracks: List[Track]) -> TraktorModels.Nodetype:
     created_playlist = TraktorModels.Nodetype(
         type="PLAYLIST",
         name=name,
@@ -59,7 +59,7 @@ def create_playlist(node: TraktorModels.Nodetype, name: str, volume: str, tracks
             entry=[TraktorModels.Entrytype(
                 primarykey=TraktorModels.Primarykeytype(
                     type="TRACK",
-                    key=path_to_traktor_formatted_path(t, volume)
+                    key=path_to_traktor_formatted_path(t.path, volume)
                 ))
                 for t in tracks]
         )
@@ -78,23 +78,22 @@ def write_auto_generated_playlists_to_traktor(
     delete_playlist_node(collection, folder_name)
     auto_generated_playlists_directory = create_playlist_directory(collection.nml.playlists.node, folder_name)
     for p in playlists:
-        create_playlist(auto_generated_playlists_directory, p.name, volume, [Path(t) for t in p.tracks])
+        create_playlist(auto_generated_playlists_directory, p.name, volume, p.tracks)
 
     collection.save()
 
 
 def write_rating_to_traktor_collection(
-        collection_nml,
-        path_to_rating_dict
-):
+        collection_nml: str,
+        tracks: Dict[str, Track]):
     collection = TraktorCollection(Path(collection_nml))
     for t in collection.nml.collection.entry:
         path = str(traktor_path_to_pathlib_path(t.location.dir, t.location.file))
 
         # print(":".join("{:02x}".format(ord(c)) for c in path))
 
-        if path in path_to_rating_dict:
-            t.info.ranking = 51 * path_to_rating_dict[path]
+        if path in tracks and tracks[path].rating is not None:
+            t.info.ranking = 51 * tracks[path].rating
             if t.info.ranking == 0:
                 t.info.ranking = 51
 
@@ -102,16 +101,15 @@ def write_rating_to_traktor_collection(
 
 
 def write_comments_to_traktor_collection(
-        collection_nml,
-        path_to_tags_dict,
-        tags_list
-):
+        collection_nml: str,
+        tracks: Dict[str, Track],
+        tags_list: List[str]):
     collection = TraktorCollection(Path(collection_nml))
     for t in collection.nml.collection.entry:
         path = str(traktor_path_to_pathlib_path(t.location.dir, t.location.file))
 
-        if path in path_to_tags_dict:
-            t.comment = _tags_to_comment(path_to_tags_dict[path], tags_list)
+        if path in tracks:
+            t.comment = _tags_to_comment(tracks[path].tags, tags_list)
 
     _save_collection(collection)
 
@@ -140,18 +138,17 @@ def _save_collection(collection_obj):
     collection_obj.save()
 
 
-def get_paths_to_rating_dict(
-        collection_nml,
-        volume
-):
+def get_tracks(collection_nml: str, volume: str) -> Dict[str, Track]:
     result = dict()
     collection = TraktorCollection(Path(collection_nml))
     for t in collection.nml.collection.entry:
         if t.location.volume != volume:
             continue
-        if not t.info.ranking:
-            continue
-        path = str(traktor_path_to_pathlib_path(t.location.dir, t.location.file))
-        result[path] = t.info.ranking / 51
-    return result
 
+        path = str(traktor_path_to_pathlib_path(t.location.dir, t.location.file))
+        # TODO: Load tags from playlists
+        track = Track(path=Path(path), tags=[], rating=None)
+        if t.info.ranking is not None and int(t.info.ranking) >= 51:
+            track.rating = t.info.ranking / 51
+        result[path] = track
+    return result

@@ -84,6 +84,8 @@ if __name__ == "__main__":
     else:
         query = sys.argv[1]
 
+    print('Query: "%s"' % query)
+
     with open(DEFAULT_PATH_FOR_JSON_FILE) as json_file:
         config = json.load(json_file)
 

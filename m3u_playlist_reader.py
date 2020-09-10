@@ -1,5 +1,5 @@
 from pathlib import Path
-from data import Playlist
+from data import Playlist, Track
 import os
 
 
@@ -14,7 +14,7 @@ def _m3u_to_playlist(m3u_path : Path):
     tracks = []
     with open(str(m3u_path.resolve()), "rt") as fout:
         for track in fout:
-            tracks.append(track.strip())
+            tracks.append(Track(Path(track.strip()), [], None))
 
     return Playlist(m3u_path.name[:-4], tracks)
 

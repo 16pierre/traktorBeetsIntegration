@@ -1,48 +1,46 @@
 from beets.library import Library
+from typing import Dict, List
+from pathlib import Path
+from data import Track
 import unicodedata
 
 
-def get_rating_by_file_dict(db_file):
+def get_tracks(db_file, tag_list: List[str]) -> Dict[str, Track]:
     result = dict()
     library = Library(db_file)
-    for i in library.items():
-        try:
-            path = convert_attr_to_string(i.path)
-            rating = int(float(i.rating))
-            if rating >= 0 and rating <= 5:
-                result[path] = int(float(i.rating))
-        except Exception as e:
-            continue
+    tag_list = [tag for tag in tag_list if tag != "rating" and not tag.startswith("_")]
+    for item in library.items():
+        path = convert_attr_to_string(item.path)
+        tags = {tag: _get_attr_dont_throw(item, tag) for tag in tag_list}
+        rating = _get_int_attr_dont_throw(item, "rating")
+        if not(rating is not None and 0 <= rating <= 5):
+            rating = None
+        result[path] = Track(Path(path), tags, rating)
+
     return result
 
-def get_tags_by_file_dict(db_file, tags_list):
-    result = dict()
-    tags_list = [tag for tag in tags_list if tag != "rating" and not tag.startswith("_")]
 
-    library = Library(db_file)
-    for i in library.items():
-        try:
-            path = convert_attr_to_string(i.path)
-            result[path] = {tag: _get_attr_dont_throw(i, tag) for tag in tags_list}
-        except Exception as e:
-            print(str(i.path))
-            print(e)
-            # raise e
-            continue
-    return result
-
-def write_ratings(db_file, path_to_rating_dict):
+def write_ratings(db_file, tracks: Dict[str, Track]):
     library = Library(db_file)
     for i in library.items():
         path = str(i.path, 'utf-8')
-        if path in path_to_rating_dict:
-            i.rating = path_to_rating_dict.get(path)
+        if path in tracks and tracks.get(path).rating is not None:
+            i.rating = tracks.get(path).rating
             i.store()
+
 
 def _get_attr_dont_throw(obj, attribute):
     if hasattr(obj, attribute):
         return str(getattr(obj, attribute))
     return None
+
+
+def _get_int_attr_dont_throw(obj, attribute):
+    try:
+        return int(float(str(getattr(obj, attribute))))
+    except Exception:
+        return None
+
 
 def convert_attr_to_string(attribute):
     if attribute is None:

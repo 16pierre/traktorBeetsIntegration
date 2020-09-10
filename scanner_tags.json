@@ -10,8 +10,8 @@
         ["genre2", "energy"],
         ["genre2", "mood"]
     ],
-    "energy": [1, 2, 3, 4, 5],
-    "rating": [1, 2, 3, 4, 5],
+    "energy": ["1", "2", "3", "4", "5"],
+    "rating": ["1", "2", "3", "4", "5"],
     "mood": ["joyful", "dark", "chill", "futurist", "energy", "nostalgy"],
     "loop": ["yes", "no"],
     "genre2": ["Soul", "Funk", "Disco", "House", "Tech House", "Minimal", "Deep House", "Tropical", "Glitch", "Jungle", "Big room",
