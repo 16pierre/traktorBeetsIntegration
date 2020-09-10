@@ -1,4 +1,13 @@
-def identify_value(value, values):
+from typing import List
+
+
+def identify_value_from_prefix(value: str, values: List[str]):
+    for v in values:
+        if v.startswith(value):
+            return v
+
+
+def identify_compressed_value(value, values):
     if isinstance(values[0], int):
         try:
             parsed_input = int(value)

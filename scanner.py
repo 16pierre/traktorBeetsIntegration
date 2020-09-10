@@ -7,6 +7,7 @@ from constants import *
 
 with open(SCANNER_TAGS_FILE) as json_file:
     TAGS_MODEL = json.load(json_file)
+# TODO: Stop using this hard-coded shit
 
 
 def prompt_tags(db_file, query):
@@ -20,6 +21,7 @@ def prompt_tags(db_file, query):
             _prompt_for_track(track, TAGS_MODEL)
             track.scan_version = VERSION
             track.store()
+
 
 def _prompt_for_track(track, tags):
     print("\n====================== \n - Title: %s\n"
@@ -36,7 +38,7 @@ def _prompt_for_track(track, tags):
                 loop = False
             if user_input.lower() == "skip":
                 return
-            identified_value = utils.identify_value(user_input, values)
+            identified_value = utils.identify_compressed_value(user_input, values)
             if identified_value is not None:
                 print(identified_value)
                 loop = False

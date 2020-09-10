@@ -17,3 +17,14 @@ class Playlist:
         self.name = name
         self.tracks = tracks
 
+
+class TagsConfiguration:
+    def __init__(self, tag_models: Dict[str, List[str]], playlists_to_generate: List[List[str]]):
+        self.tag_models = tag_models
+        self.playlists_to_generate = playlists_to_generate
+
+    @staticmethod
+    def from_dict(json_dict: Dict):
+        playlists_to_generate = json_dict.pop("_playlists")
+        tag_models = {k: v for k, v in json_dict.items()}
+        return TagsConfiguration(tag_models, playlists_to_generate)

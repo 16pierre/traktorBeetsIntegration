@@ -1,9 +1,11 @@
 {
     "traktor": "/Users/16pierre/Documents/Native Instruments/Traktor 3.3.0/collection.nml",
     "volume": "Macintosh HD",
-    "m3uDirectoryName": "aaBeetSmartPlaylists",
+    "m3uDirectoryName": "aaM3UPlaylists",
     "m3uPath": "/Users/16pierre/Music/smartPlaylists",
+    "generatedPlaylistsDirectoryName": "aaaGeneratedPlaylists",
     "beetsLibrary": "/Users/16pierre/beets/musiclibrary.db",
     "beetsConfigTemplate": "/Users/16pierre/beets/config.template.yaml",
-    "beetsConfigGenerated": "/Users/16pierre/beets/config.yaml"
+    "beetsConfigGenerated": "/Users/16pierre/beets/config.yaml",
+    "tagsConfiguration": "./scanner_tags.json"
 }
