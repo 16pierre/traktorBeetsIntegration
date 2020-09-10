@@ -36,7 +36,7 @@ if __name__ == "__main__":
     print("Found %s playlists in %s: %s" % (len(playlists), playlists_dir, [p.name for p in playlists]))
 
     print("Writing playlists to Traktor %s playlist folder" % folder_name)
-    traktor.write_custom_playlists_to_traktor_collection(
+    traktor.write_auto_generated_playlists_to_traktor(
         traktor_collection,
         playlists,
         volume,

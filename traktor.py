@@ -1,89 +1,87 @@
 from traktor_nml_utils import TraktorCollection
-import uuid
+import traktor_nml_utils.models.collection as TraktorModels
+from typing import Type, List
 from data import Playlist
 from pathlib import Path
-import xml.etree.ElementTree as ET
-from pathlib import Path
 
-def parse_collection(nml_path):
-    return ET.parse(nml_path)
-
-def playlist_root(et_root):
-    return list(et_root.findall("PLAYLISTS"))[0]
-
-def remove_custom_playlist_folder(playlist_root, folder_name):
-    for entry in playlist_root.findall("NODE"):
-        if entry is not None and entry.get("NAME") == folder_name:
-            print("Removing existing folder")
-            playlist_root.remove(entry)
-
-def fresh_playlist_node(folder_name, playlists, volume):
-
-    """
-
-<PLAYLISTS>
-    <NODE TYPE="FOLDER" NAME="$ROOT">
-    <SUBNODES COUNT="41">
-    <NODE TYPE="PLAYLIST" NAME="aaa roger">
-    <PLAYLIST ENTRIES="14" TYPE="LIST" UUID="023e5cc077aa4fe2b4efd5d32c58079c"><ENTRY>
-    <PRIMARYKEY TYPE="TRACK" KEY="Macintosh HD/:Users/:16pierre/:Music/:iTunes/:iTunes Media/:Music/:Beyond the Shadow of a Dream.mp3">
-    </PRIMARYKEY>
-</ENTRY>
-    """
-    folder = ET.Element("NODE")
-    folder.set("TYPE", "FOLDER")
-    folder.set("NAME", folder_name)
-
-    subnodes = ET.Element("SUBNODES")
-
-    for p in playlists:
-        playlist_node = ET.Element("NODE")
-        playlist_node.set("NAME", p.name)
-        playlist_node.set("TYPE", "PLAYLIST")
-
-        playlist = ET.Element("PLAYLIST")
-        playlist.set("TYPE", "LIST")
-        playlist.set("ENTRIES", str(len(p.tracks)))
-        playlist.set("UUID", str(uuid.uuid4()))
-
-        for t in reversed(p.tracks):
-            entry = ET.Element("ENTRY")
-            track = ET.Element("PRIMARYKEY")
-            track.set("TYPE", "TRACK")
-            track.set("KEY", path_to_traktor_formatted_path(Path(t), volume))
-            entry.insert(0, track)
-            playlist.insert(0, entry)
-
-        playlist_node.insert(0, playlist)
-        subnodes.insert(0, playlist_node)
-
-    folder.insert(0, subnodes)
-    return folder
 
 def path_to_traktor_formatted_path(path : Path, volume):
     if path is None or path.parent == path:
         return volume
     return path_to_traktor_formatted_path(path.parent, volume) + "/:" + path.name
 
+
 def traktor_path_to_pathlib_path(traktor_dir, traktor_name) -> Path:
     return Path(traktor_dir.replace("/:", "/")).joinpath(traktor_name)
 
-def create_or_replace_custom_playlists(playlist_root, folder_name, playlists, volume):
-    remove_custom_playlist_folder(playlist_root, folder_name)
-    playlist_root.insert(0, fresh_playlist_node(folder_name, playlists, volume))
 
-def write_custom_playlists_to_traktor_collection(
-        collection_nml,
-        playlists,
-        volume,
-        folder_name
-):
-    collection = parse_collection(collection_nml)
-    create_or_replace_custom_playlists(playlist_root(collection.getroot()),
-                                       folder_name,
-                                       playlists,
-                                       volume)
-    collection.write(collection_nml)
+def init_playlists_root_node(traktor_collection : TraktorCollection):
+    if not traktor_collection.nml.playlists:
+        traktor_collection.nml.playlists = TraktorModels.Playliststype()
+    if not traktor_collection.nml.playlists.node:
+        traktor_collection.nml.playlists.node = TraktorModels.Nodetype(
+            type="FOLDER", name="$ROOT")
+    if not traktor_collection.nml.playlists.node.subnodes:
+        traktor_collection.nml.playlists.node.subnodes = TraktorModels.Subnodestype()
+    if not traktor_collection.nml.playlists.node.subnodes.node:
+        traktor_collection.nml.playlists.node.subnodes.node = []
+
+
+def create_subnodes():
+    subnodes = TraktorModels.Subnodestype()
+    subnodes.node = []
+    return subnodes
+
+
+def delete_playlist_node(traktor_collection : TraktorCollection, name : str):
+    index_to_delete = -1
+    for i, subnode in enumerate(traktor_collection.nml.playlists.node.subnodes.node):
+        if subnode.name == name:
+            index_to_delete = i
+            break
+    if index_to_delete >= 0:
+        traktor_collection.nml.playlists.node.subnodes.node.pop(index_to_delete)
+
+
+def create_playlist_directory(node : TraktorModels.Nodetype, name : str) -> TraktorModels.Nodetype:
+    created_node = TraktorModels.Nodetype(type="FOLDER", name=name)
+    created_node.subnodes = create_subnodes()
+    node.subnodes.node.append(created_node)
+    return created_node
+
+
+def create_playlist(node: TraktorModels.Nodetype, name: str, volume: str, tracks: List[Path]) -> TraktorModels.Nodetype:
+    created_playlist = TraktorModels.Nodetype(
+        type="PLAYLIST",
+        name=name,
+        playlist=TraktorModels.Playlisttype(
+            type="LIST",
+            entry=[TraktorModels.Entrytype(
+                primarykey=TraktorModels.Primarykeytype(
+                    type="TRACK",
+                    key=path_to_traktor_formatted_path(t, volume)
+                ))
+                for t in tracks]
+        )
+    )
+    node.subnodes.node.append(created_playlist)
+    return created_playlist
+
+
+def write_auto_generated_playlists_to_traktor(
+        collection_nml_path: str,
+        playlists: List[Playlist],
+        volume: str,
+        folder_name: str):
+    collection = TraktorCollection(Path(collection_nml_path))
+    init_playlists_root_node(collection)
+    delete_playlist_node(collection, folder_name)
+    auto_generated_playlists_directory = create_playlist_directory(collection.nml.playlists.node, folder_name)
+    for p in playlists:
+        create_playlist(auto_generated_playlists_directory, p.name, volume, [Path(t) for t in p.tracks])
+
+    collection.save()
+
 
 def write_rating_to_traktor_collection(
         collection_nml,
@@ -102,6 +100,7 @@ def write_rating_to_traktor_collection(
 
     _save_collection(collection)
 
+
 def write_comments_to_traktor_collection(
         collection_nml,
         path_to_tags_dict,
@@ -115,6 +114,7 @@ def write_comments_to_traktor_collection(
             t.comment = _tags_to_comment(path_to_tags_dict[path], tags_list)
 
     _save_collection(collection)
+
 
 def _tags_to_comment(track_tags, tags_list):
     result = ""
