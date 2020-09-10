@@ -6,9 +6,11 @@ import traktor
 import m3u_playlist_reader
 import beets_manager
 import beets_config_generator
+import import_utils
 import scanner
 import time
 import data
+from pathlib import Path
 
 
 if __name__ == "__main__":
@@ -113,6 +115,21 @@ if __name__ == "__main__":
         volume,
         auto_generated_playlists_directory_name
     )
+
+    # Utils to import more easily
+    print("\n===== Starting running utils for beet import ======")
+    symlink_directory = Path(config.get("temporaryFolderForTracksImportedInTraktorButNotInBeets"))
+    import_utils.create_links_to_files_imported_in_traktor_but_not_in_beets(
+        symlink_directory,
+        traktor_tracks,
+        beets_tracks
+    )
+    import_utils.remove_links_when_imported_in_beets_and_update_traktor_paths(
+        traktor_collection,
+        traktor_tracks,
+        beets_tracks
+    )
+
 
     print("Done !")
 

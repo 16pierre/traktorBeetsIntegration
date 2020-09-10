@@ -16,6 +16,10 @@ def traktor_path_to_pathlib_path(traktor_dir: str, traktor_name: str) -> Path:
     return Path(traktor_dir.replace("/:", "/")).joinpath(traktor_name)
 
 
+def pathlib_path_to_traktor_dir_and_file_couple(path: Path):
+    return (str(path.parent.absolute()) + "/").replace("/", "/:"), str(path.name)
+
+
 def traktor_absolute_path_to_pathlib_path(traktor_absolute_path: str) -> Path:
     return Path(("/" + traktor_absolute_path.split("/:", 1)[1]).replace("/:", "/"))
 
@@ -188,5 +192,33 @@ def get_tracks(
         track = Track(path=Path(path), tags=tags, rating=None)
         if t.info.ranking is not None and int(t.info.ranking) >= 51:
             track.rating = t.info.ranking / 51
+        if t.album is not None and t.album.title:
+            track.album = t.album.title
         result[path] = track
     return result
+
+
+def update_tracks_locations(
+        collection_nml: str,
+        old_to_new_locations: Dict[Path, Path]):
+
+    collection = TraktorCollection(Path(collection_nml))
+    count = 0
+    for t in collection.nml.collection.entry:
+        path = traktor_path_to_pathlib_path(t.location.dir, t.location.file)
+        if path in old_to_new_locations:
+            new_path = old_to_new_locations[path]
+            t.location.dir, t.location.file = pathlib_path_to_traktor_dir_and_file_couple(new_path)
+            count += 1
+            # print("TRAKTOR: Replaced %s by %s" % (path, new_path))
+    _save_collection(collection)
+    print("Relocated %s tracks in Traktor" % count)
+
+
+if __name__ == "__main__":
+    assert pathlib_path_to_traktor_dir_and_file_couple(
+        traktor_path_to_pathlib_path("/:Users/:16pierre/:Music/:DJLibrary/:Disclosure/:Moog for Love/:",
+                                        "02 Feel Like I Do.mp3")) == \
+           ("/:Users/:16pierre/:Music/:DJLibrary/:Disclosure/:Moog for Love/:", "02 Feel Like I Do.mp3")
+    pass
+
