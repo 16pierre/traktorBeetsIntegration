@@ -25,7 +25,7 @@ def write_tracks_rating_and_tags(db_file, tracks: Dict[str, Track]):
     conflicting_tracks = []
     traktor_modification_count = 0
     for i in library.items():
-        path = str(i.path, 'utf-8').lower()
+        path = convert_attr_to_string(i.path).lower()
         if path in tracks:
 
             if tracks.get(path).rating is not None:

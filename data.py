@@ -18,6 +18,12 @@ class Playlist:
         self.name = name
         self.tracks = tracks
 
+    def contains_track(self, track_path: Path):
+        for t in self.tracks:
+            if t.path == track_path:
+                return True
+        return False
+
 
 class TagsConfiguration:
     def __init__(self, tag_models: Dict[str, List[str]], playlists_to_generate: List[List[str]]):

@@ -18,7 +18,8 @@ _RECORDING_PATTERN = re.compile("\d{4}-\d{2}-\d{1,2}(_\d{1,2}h\d{2}m\d{2})?(_\d{
 def remove_links_when_imported_in_beets_and_update_traktor_paths(
         traktor_nml_path: str,
         traktor_tracks: Dict[str, Track],
-        beets_tracks: Dict[str, Track]
+        beets_tracks: Dict[str, Track],
+        volume: str
 ):
     tracks_symlinked_count = 0
     symlinks_removed_count = 0
@@ -28,7 +29,7 @@ def remove_links_when_imported_in_beets_and_update_traktor_paths(
         last_symlink = beet_track.path
         while last_symlink.is_symlink():
             symlinks.append(last_symlink)
-            last_symlink = Path(os.readlink(str(last_symlink)))
+            last_symlink = Path(os.readlink(str(last_symlink)).lower())
 
         if not symlinks:
             continue
@@ -46,7 +47,7 @@ def remove_links_when_imported_in_beets_and_update_traktor_paths(
     print("Total number of symlinked tracks: %s ; removed links: %s" % (tracks_symlinked_count, symlinks_removed_count))
 
     print("Relocating tracks in Traktor...")
-    traktor.update_tracks_locations(traktor_nml_path, relocations)
+    traktor.update_tracks_locations(traktor_nml_path, relocations, volume)
 
 
 def _cleanup_empty_directories(original_paths: Iterable[Path]):
@@ -145,7 +146,8 @@ if __name__ == "__main__":
     remove_links_when_imported_in_beets_and_update_traktor_paths(
         traktor_collection,
         traktor_tracks,
-        beets_tracks
+        beets_tracks,
+        volume
     )
 
 
