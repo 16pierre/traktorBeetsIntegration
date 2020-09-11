@@ -10,7 +10,7 @@ def get_tracks(db_file, tag_list: List[str]) -> Dict[str, Track]:
     library = Library(db_file)
     tag_list = [tag for tag in tag_list if tag != "rating" and not tag.startswith("_")]
     for item in library.items():
-        path = convert_attr_to_string(item.path)
+        path = convert_attr_to_string(item.path).lower()
         tags = {tag: _get_attr_dont_throw(item, tag) for tag in tag_list}
         rating = _get_int_attr_dont_throw(item, "rating")
         if not(rating is not None and 0 <= rating <= 5):

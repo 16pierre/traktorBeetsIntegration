@@ -89,9 +89,9 @@ def _create_temporary_symlink_path_for_track(
 
     if bool(_RECORDING_PATTERN.match(track.path.name)):
         return
-    if "Native Instruments" in str(track.path):
+    if "native instruments" in str(track.path).lower():
         return
-    if "Traktor" in str(track.path):
+    if "traktor" in str(track.path).lower():
         return
 
     symlink_path = _get_temporary_symlink_path_for_track(symlink_directory, track)

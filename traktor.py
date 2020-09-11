@@ -185,7 +185,7 @@ def get_tracks(
         if t.location.volume != volume:
             continue
 
-        path = str(traktor_path_to_pathlib_path(t.location.dir, t.location.file))
+        path = str(traktor_path_to_pathlib_path(t.location.dir, t.location.file)).lower()
         tags = dict()
         if path in tagged_tracks:
             tags = tagged_tracks.get(path).tags
@@ -205,12 +205,12 @@ def update_tracks_locations(
     collection = TraktorCollection(Path(collection_nml))
     count = 0
     for t in collection.nml.collection.entry:
-        path = traktor_path_to_pathlib_path(t.location.dir, t.location.file)
+        path = Path(str(traktor_path_to_pathlib_path(t.location.dir, t.location.file)).lower())
         if path in old_to_new_locations:
             new_path = old_to_new_locations[path]
             t.location.dir, t.location.file = pathlib_path_to_traktor_dir_and_file_couple(new_path)
             count += 1
-            # print("TRAKTOR: Replaced %s by %s" % (path, new_path))
+            print("TRAKTOR: Replaced %s by %s" % (path, new_path))
     _save_collection(collection)
     print("Relocated %s tracks in Traktor" % count)
 
