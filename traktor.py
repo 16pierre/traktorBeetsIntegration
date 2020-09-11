@@ -124,7 +124,7 @@ def write_rating_to_traktor_collection(
         tracks: Dict[str, Track]):
     collection = TraktorCollection(Path(collection_nml))
     for t in collection.nml.collection.entry:
-        path = str(traktor_path_to_pathlib_path(t.location.dir, t.location.file))
+        path = str(traktor_path_to_pathlib_path(t.location.dir, t.location.file)).lower()
 
         # print(":".join("{:02x}".format(ord(c)) for c in path))
 
@@ -142,7 +142,7 @@ def write_comments_to_traktor_collection(
         tags_list: List[str]):
     collection = TraktorCollection(Path(collection_nml))
     for t in collection.nml.collection.entry:
-        path = str(traktor_path_to_pathlib_path(t.location.dir, t.location.file))
+        path = str(traktor_path_to_pathlib_path(t.location.dir, t.location.file)).lower()
 
         if path in tracks:
             t.comment = _tags_to_comment(tracks[path].tags, tags_list)
