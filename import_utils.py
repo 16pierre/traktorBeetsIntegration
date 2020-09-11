@@ -57,7 +57,8 @@ def _cleanup_empty_directories(original_paths: Iterable[Path]):
             os.rmdir(str(d))
             next_cleanup.add(d.parent)
             print("Cleaned up empty dir %s" % d)
-    _cleanup_empty_directories(next_cleanup)
+    if next_cleanup:
+        _cleanup_empty_directories(next_cleanup)
 
 
 def create_links_to_files_imported_in_traktor_but_not_in_beets(
