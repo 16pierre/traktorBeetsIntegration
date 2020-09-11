@@ -124,30 +124,30 @@ Importing `Beets`' library in `Traktor` is easy: you can simply setup the `Trakt
 default music directories to include `Beets`' folder. 
 
 The issue is rather importing `Traktor`'s library in `Beets`:
-- if you copy the files in `Beets`, you'd end up with useless duplicates
+- if you copy the files to `Beets`, you'd end up with useless duplicates
 - if you move the files to `Beets`, you'd need to relocate all the tracks
 - running `beet import` is not easy if the files in your `Traktor` library are not centralized
 
-That's why I implemented some utils for this use case
+That's why I implemented some utils for this use case.
 
 #### How these utils work
 
 Let's see what happens step by step when running `pipenv run import` 
 (this also happens when running `pipenv run sync`):
-0. Import whatever you want in `Traktor`, you can also sort your tracks in playlists like explained above: 
+1. Import whatever you want in `Traktor`, you can also sort your tracks in playlists like explained above: 
 this will be tagged later even if your tracks are not imported in `beets` yet
-1. _Automatic_: find all tracks imported in `Traktor` but not in `Beets`
-2. _Automatic_: symlink these files to a temporary directory organized by album 
-3. _Manual action required_: `beet import` in the temporary directory. 
+2. _Automatic_: find all tracks imported in `Traktor` but not in `Beets`
+3. _Automatic_: symlink these files to a temporary directory organized by album 
+4. _Manual action required_: `beet import` in the temporary directory. 
 **Warning:** you need to 
 [configure](https://beets.readthedocs.io/en/stable/reference/config.html#link) 
 `import.link = yes` in `Beets` config 
-4. _Manual action required_: **close Traktor if opened**.
-5. At this point, we have a double symlink: `beet_library -> temporary folder -> original track`
-6. _Automatic_: detects that tracks have been imported in `Beets` thanks to the symlinks.
-7. _Automatic_: delete symlinks, move the original files to `beet_library`, 
+5. _Manual action required_: **close Traktor if opened**.
+6. At this point, we have a double symlink: `beet_library -> temporary folder -> original track`
+7. _Automatic_: detects that tracks have been imported in `Beets` thanks to the symlinks.
+8. _Automatic_: delete symlinks, move the original files to `beet_library`, 
 and update `Traktor` library to point to `beet_library` instead of the original files. 
-8. You can reopen Traktor now :)
+9. You can reopen Traktor now :)
  
 
 ## Motivations
