@@ -125,6 +125,8 @@ if __name__ == "__main__":
 
     print("=============")
 
+    # Refresh beets tracks, tags have possibly been updated after writing traktor->beets
+    beets_tracks = beets_manager.get_tracks(beets_db, scanner.TAGS_MODEL.keys())
 
     traktor.write_rating_to_traktor_collection(
         traktor_collection,
@@ -155,8 +157,6 @@ if __name__ == "__main__":
         volume,
         auto_generated_playlists_directory_name
     )
-
-
 
     print("Done !")
 

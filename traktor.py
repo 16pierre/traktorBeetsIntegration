@@ -145,7 +145,7 @@ def write_comments_to_traktor_collection(
         path = str(traktor_path_to_pathlib_path(t.location.dir, t.location.file)).lower()
 
         if path in tracks:
-            t.comment = _tags_to_comment(tracks[path].tags, tags_list)
+            t.info.comment = _tags_to_comment(tracks[path].tags, tags_list)
 
     _save_collection(collection)
 
