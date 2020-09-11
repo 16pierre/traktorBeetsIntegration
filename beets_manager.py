@@ -25,7 +25,7 @@ def write_tracks_rating_and_tags(db_file, tracks: Dict[str, Track]):
     conflicting_tracks = []
     traktor_modification_count = 0
     for i in library.items():
-        path = str(i.path, 'utf-8')
+        path = str(i.path, 'utf-8').lower()
         if path in tracks:
 
             if tracks.get(path).rating is not None:
@@ -51,7 +51,7 @@ def write_tracks_rating_and_tags(db_file, tracks: Dict[str, Track]):
         print("==========================")
         print("Conflicting tags were overwritten in beets: Traktor tags have priority over beets")
         print("Total conflicting tracks: %s" % len(conflicting_tracks))
-    print("News tags coming from Traktor: %s" % traktor_modification_count)
+    print("New tags coming from Traktor: %s" % traktor_modification_count)
 
 
 def _get_attr_dont_throw(obj, attribute):

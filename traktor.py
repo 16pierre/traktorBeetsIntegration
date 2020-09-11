@@ -64,7 +64,7 @@ def list_playlists_in_node(traktor_collection: TraktorCollection, name: str) -> 
                         for entry in playlist.playlist.entry:
                             if not entry.primarykey or entry.primarykey.type != "TRACK":
                                 continue
-                            track_path = traktor_absolute_path_to_pathlib_path(entry.primarykey.key)
+                            track_path = Path(str(traktor_absolute_path_to_pathlib_path(entry.primarykey.key)).lower())
                             tracks.append(Track(track_path, dict(), None))
                         result.append(Playlist(playlist.name, tracks))
                 print("Found %s Traktor playlists in folder %s" % (len(result), name))
