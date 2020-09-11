@@ -16,7 +16,9 @@ Planned features:
 - multi-value metadata support
 - create an issue if you have a feature request ;)
 
-To better understand how this project was born, see the [Motivation section](#Motivation).
+To better understand how this project was born, see the [Motivations section](#Motivations).
+
+Feel free to contribute with PRs/issues !
 
 ## Install
 
@@ -35,6 +37,7 @@ cp locations.json.template locations.json
 
 1. Edit `locations.json` to specify where your `Traktor` `collection.nml` file is etc.
 2. Edit `scanner_tags.json` to specify the different custom tags you want to use & playlists you want to generate
+3. For import utils: edit `Beets` config: set `import.link: yes` (see [below](#configuration-required))
 
 ## Usage
 
@@ -53,9 +56,19 @@ pipenv run scan artist:Daft Punk
 etc.
 ```
 
+
+### Utils: import helper
+Helps you import your `Traktor` library inside `Beets`. See below for more explanation, this is not trivial.
+```
+pipenv run import
+```
+
 ## Features
 
 ### Sync Beets<->Traktor
+
+In this section, let's assume that tracks are imported in both `Beets` and `Traktor`, 
+and that they both use the same file paths.
 
 The core idea here is the link between `Traktor`'s playlists and `Beets` metadata. Let's take a few examples.
 
@@ -78,25 +91,66 @@ This will create 3 kinds of playlists in `Traktor`:
 - one for each `(mood, energy)` couple: `mood: dark, energy: 1` 
 
 Note:
-- to avoid noise, this won't create playlists if they are empty)
+- to avoid noise, this won't create playlists if they are empty
 - to keep playlists sorted in Traktor, a prefix is added to the playlist name to match the order in `_playlists` 
 
-With this system, we can unambiguously link `Beets metadata` to `Traktor playlists`, 
-and this helps
+With this system, we can unambiguously link `Beets metadata` to `Traktor playlists`; 
+this link is the core mechanism behind the sync:
+1. Editing a tag in `Beets` will update the matching `Traktor` playlists
+2. Adding a track to a `Traktor` playlist will update the corresponding tags in `Beets`
 
-Here's what happens during a sync:
-- `Beets`' library is read, and this creates playlists in Traktor for each tag configured in `scanner_tags.json`
-- `Traktor`'s playlists are read, and if you added tracks in the automatically generated
- 
+Extra mechanisms:
+- you can use the star rating system in `Traktor`, it's synced with the `rating` tag in `Beets`.
+- to help you visualize the metadata in `Traktor`, the sync writes comments on the Track to list the custom tags 
+(warning: this will override existing comments, 
+will be fixed, issue: https://github.com/16pierre/traktorPlaylistExport/issues/1)
+
 
 ### Help import Traktor library into Beets
 
+#### Configuration required
 
-### Write comments to Traktor files
+**Note:** this util requires using `beet import` with symlinks. You therefore need to configure `Beets` like this:
+```
+import:
+    link: yes
+``` 
+For more details, see [Beets docs](https://beets.readthedocs.io/en/stable/reference/config.html#link).
 
+#### Why add utils for imports
+In order for the sync to work properly, you need to have imported the tracks in both `Traktor` and `Beets`.
 
+Importing `Beets`' library in `Traktor` is easy: you can simply setup the `Traktor` 
+default music directories to include `Beets`' folder. 
 
-## Motivation
+The issue is rather importing `Traktor`'s library in `Beets`:
+- if you copy the files in `Beets`, you'd end up with useless duplicates
+- if you move the files to `Beets`, you'd need to relocate all the tracks
+- running `beet import` is not easy if the files in your `Traktor` library are not centralized
+
+That's why I implemented some utils for this use case
+
+#### How these utils work
+
+Let's see what happens step by step when running `pipenv run import` 
+(this also happens when running `pipenv run sync`):
+0. Import whatever you want in `Traktor`, you can also sort your tracks in playlists like explained above: 
+this will be tagged later even if your tracks are not imported in `beets` yet
+1. _Automatic_: find all tracks imported in `Traktor` but not in `Beets`
+2. _Automatic_: symlink these files to a temporary directory organized by album 
+3. _Manual action required_: `beet import` in the temporary directory. 
+**Warning:** you need to 
+[configure](https://beets.readthedocs.io/en/stable/reference/config.html#link) 
+`import.link = yes` in `Beets` config 
+4. _Manual action required_: **close Traktor if opened**.
+5. At this point, we have a double symlink: `beet_library -> temporary folder -> original track`
+6. _Automatic_: detects that tracks have been imported in `Beets` thanks to the symlinks.
+7. _Automatic_: delete symlinks, move the original files to `beet_library`, 
+and update `Traktor` library to point to `beet_library` instead of the original files. 
+8. You can reopen Traktor now :)
+ 
+
+## Motivations
 
 If you take a look at Native Instrument's forum, you'll find that a lot of people are frustrated 
 by Traktor filesystem. So am I. I do love Traktor, but there are still some major painpoints:
