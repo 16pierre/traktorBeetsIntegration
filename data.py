@@ -14,9 +14,11 @@ class Track:
 
 
 class Playlist:
-    def __init__(self, name, tracks: List[Track]):
+    def __init__(self, name, tracks: List[Track], tag_keys: List[str] = [], folder_index: int = 0):
         self.name = name
         self.tracks = tracks
+        self.tag_keys = tag_keys
+        self.folder_index = folder_index
 
     def contains_track(self, track_path: Path):
         for t in self.tracks:

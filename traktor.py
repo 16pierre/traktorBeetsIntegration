@@ -56,30 +56,42 @@ def delete_playlist_node(traktor_collection : TraktorCollection, name : str):
         traktor_collection.nml.playlists.node.subnodes.node.pop(index_to_delete)
 
 
-def list_playlists_in_node(traktor_collection: TraktorCollection, name: str) -> List[Playlist]:
-    for subnode in traktor_collection.nml.playlists.node.subnodes.node:
-        if subnode.name == name:
-            if subnode.subnodes and subnode.subnodes.node:
+def list_playlists_in_node(node: TraktorModels.Nodetype) -> List[Playlist]:
+    result = []
+    if node.playlist and node.playlist.entry:
+        tracks = []
+        for entry in node.playlist.entry:
+            if not entry.primarykey or entry.primarykey.type != "TRACK":
+                continue
+            track_path = Path(str(traktor_absolute_path_to_pathlib_path(entry.primarykey.key)).lower())
+            tracks.append(Track(track_path, dict(), None))
+        result.append(Playlist(node.name, tracks))
 
-                result = []
-                for playlist in subnode.subnodes.node:
-                    if playlist.playlist and playlist.playlist.entry:
-                        tracks = []
-                        for entry in playlist.playlist.entry:
-                            if not entry.primarykey or entry.primarykey.type != "TRACK":
-                                continue
-                            track_path = Path(str(traktor_absolute_path_to_pathlib_path(entry.primarykey.key)).lower())
-                            tracks.append(Track(track_path, dict(), None))
-                        result.append(Playlist(playlist.name, tracks))
-                print("Found %s Traktor playlists in folder %s" % (len(result), name))
-                return result
+    if node.subnodes and node.subnodes.node:
+        for n in node.subnodes.node:
+            result.extend(list_playlists_in_node(n))
+
+    return result
 
 
-    print("Traktor warning: playlist folder %s not found !" % name)
+def list_playlists_in_collection(traktor_collection: TraktorCollection, playlist_folder_name: str) -> List[Playlist]:
+    if not traktor_collection.nml.playlists or not traktor_collection.nml.playlists.node:
+        return []
+    for node in traktor_collection.nml.playlists.node.subnodes.node:
+        if  node.name == playlist_folder_name:
+            result = list_playlists_in_node(node)
+            print("Found %s Traktor playlists in folder %s" % (len(result), playlist_folder_name))
+            return result
+
+    print("Traktor warning: playlist folder %s not found !" % playlist_folder_name)
     return []
 
 
 def create_playlist_directory(node : TraktorModels.Nodetype, name : str) -> TraktorModels.Nodetype:
+    if node.subnodes and node.subnodes.node:
+        for n in node.subnodes.node:
+            if n.name == name:
+                return n
     created_node = TraktorModels.Nodetype(type="FOLDER", name=name)
     created_node.subnodes = create_subnodes()
     node.subnodes.node.append(created_node)
@@ -112,9 +124,15 @@ def write_playlists_to_traktor(
     collection = TraktorCollection(Path(collection_nml_path))
     init_playlists_root_node(collection)
     delete_playlist_node(collection, folder_name)
-    auto_generated_playlists_directory = create_playlist_directory(collection.nml.playlists.node, folder_name)
+    auto_generated_playlists_node = create_playlist_directory(collection.nml.playlists.node, folder_name)
     for p in playlists:
-        create_playlist(auto_generated_playlists_directory, p.name, volume, p.tracks)
+        directory_for_playlist = auto_generated_playlists_node
+        if p.tag_keys and p.folder_index:
+            subnode_name_prefix = "%02d" % p.folder_index
+            subnode_name = subnode_name_prefix + " - " + ", ".join(p.tag_keys)
+            directory_for_playlist = create_playlist_directory(auto_generated_playlists_node, subnode_name)
+
+        create_playlist(directory_for_playlist, p.name, volume, p.tracks)
 
     collection.save()
 
@@ -152,7 +170,7 @@ def write_comments_to_traktor_collection(
 
 def _tags_to_comment(track_tags, tags_list):
     result = ""
-    for tag in tags_list:
+    for tag in reversed(tags_list):
         tag_value = track_tags.get(tag)
         if tag_value is not None and tag_value != "":
             if tag_value == "yes":
@@ -178,7 +196,7 @@ def list_auto_generated_playlists(
         collection_nml: str,
         auto_generated_playlists_folder: str) -> List[Playlist]:
     collection = TraktorCollection(Path(collection_nml))
-    return list_playlists_in_node(collection, auto_generated_playlists_folder)
+    return list_playlists_in_collection(collection, auto_generated_playlists_folder)
 
 
 def get_tracks(
@@ -189,7 +207,7 @@ def get_tracks(
     result = dict()
     collection = TraktorCollection(Path(collection_nml))
 
-    auto_generated_playlists = list_playlists_in_node(collection, auto_generated_playlists_folder)
+    auto_generated_playlists = list_playlists_in_collection(collection, auto_generated_playlists_folder)
     tagged_tracks = playlist_manager.tagged_tracks_from_playlists(auto_generated_playlists)
 
     for t in collection.nml.collection.entry:
@@ -224,18 +242,19 @@ def update_tracks_locations(
             count += 1
             print("TRAKTOR: Replaced %s by %s" % (path, new_path))
 
-    for subnode in collection.nml.playlists.node.subnodes.node:
-        if subnode.subnodes and subnode.subnodes.node:
-            for playlist in subnode.subnodes.node:
-                if playlist.playlist and playlist.playlist.entry:
-                    for t in playlist.playlist.entry:
-                        if not t.primarykey or not t.primarykey.key:
-                            continue
-                        p = traktor_absolute_path_to_pathlib_path(t.primarykey.key)
-                        if p in old_to_new_locations:
-                            new_path = old_to_new_locations[path]
-                            t.primarykey.key = pathlib_path_to_traktor_absolute_path(new_path, volume)
-                            print("TRAKTOR PLAYLIST: Replaced %s by %s" % (path, new_path))
+    if collection.nml.playlists and collection.nml.playlists.node.subnodes:
+        for subnode in collection.nml.playlists.node.subnodes.node:
+            if subnode.subnodes and subnode.subnodes.node:
+                for playlist in subnode.subnodes.node:
+                    if playlist.playlist and playlist.playlist.entry:
+                        for t in playlist.playlist.entry:
+                            if not t.primarykey or not t.primarykey.key:
+                                continue
+                            p = traktor_absolute_path_to_pathlib_path(t.primarykey.key)
+                            if p in old_to_new_locations:
+                                new_path = old_to_new_locations[path]
+                                t.primarykey.key = pathlib_path_to_traktor_absolute_path(new_path, volume)
+                                print("TRAKTOR PLAYLIST: Replaced %s by %s" % (path, new_path))
 
     _save_collection(collection)
     print("Relocated %s tracks in Traktor" % count)
