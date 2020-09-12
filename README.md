@@ -20,6 +20,10 @@ To better understand how this project was born, see the [Motivations section](#M
 
 Feel free to contribute with PRs/issues !
 
+## See it in action !
+
+Created a quick Youtube video in addition to this doc to show the workflow: [here's the link](https://youtu.be/Mryh9AjpmfU).
+
 ## Install
 
 This projects was developed `pipenv` + `python 3.8`.
