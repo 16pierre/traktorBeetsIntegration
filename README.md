@@ -90,10 +90,6 @@ This will create 3 kinds of playlists in `Traktor`:
 - one for each `energy`: `energy: 1`...
 - one for each `(mood, energy)` couple: `mood: dark, energy: 1` 
 
-Note:
-- to avoid noise, this won't create playlists if they are empty
-- to keep playlists sorted in Traktor, a prefix is added to the playlist name to match the order in `_playlists` 
-
 With this system, we can unambiguously link `Beets metadata` to `Traktor playlists`; 
 this link is the core mechanism behind the sync:
 1. Editing a tag in `Beets` will update the matching `Traktor` playlists
