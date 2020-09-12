@@ -3,11 +3,12 @@ from pathlib import Path
 
 
 class Track:
-    def __init__(self, path: Path, tags: Dict[str, str], rating: int, album: str = None):
+    def __init__(self, path: Path, tags: Dict[str, str], rating: int, album: str = None, comment: str = None):
         self.path = path
         self.tags = tags
         self.rating = rating
         self.album = album
+        self.comment = comment
 
     def __str__(self):
         return "PATH: %s ; TAGS: %s ; RATING: %s" % (self.path, self.tags, self.rating)

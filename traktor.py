@@ -208,7 +208,8 @@ def get_tracks(
     collection = TraktorCollection(Path(collection_nml))
 
     auto_generated_playlists = list_playlists_in_collection(collection, auto_generated_playlists_folder)
-    tagged_tracks = playlist_manager.tagged_tracks_from_playlists(auto_generated_playlists)
+
+    tagged_tracks_not_flattened = playlist_manager.tagged_tracks_from_playlists(auto_generated_playlists)
 
     for t in collection.nml.collection.entry:
         if t.location.volume != volume:
@@ -216,9 +217,22 @@ def get_tracks(
 
         path = str(traktor_path_to_pathlib_path(t.location.dir, t.location.file)).lower()
         tags = dict()
-        if path in tagged_tracks:
-            tags = tagged_tracks.get(path).tags
-        track = Track(path=Path(path), tags=tags, rating=None)
+        comment = None
+        if t.info and t.info.comment:
+            comment = t.info.comment
+        if path in tagged_tracks_not_flattened:
+            for tagged_track in tagged_tracks_not_flattened[path]:
+                for tag_key, tag_value in tagged_track.tags.items():
+                    if tag_key not in tags:
+                        tags[tag_key] = tag_value
+                    elif tags[tag_key] != tag_value:
+                        # Conflict between playlists, this means the user has placed the track in multiple playlists
+                        # To see which tags are the previous/new values, let's check the comment
+                        if tags[tag_key] in comment and \
+                                (tag_value not in comment or len(tag_value) < len(tags[tag_key])):
+                            tags[tag_key] = tag_value
+
+        track = Track(path=Path(path), tags=tags, rating=None, comment=comment)
         if t.info.ranking is not None and int(t.info.ranking) >= 51:
             track.rating = t.info.ranking / 51
         if t.album is not None and t.album.title:

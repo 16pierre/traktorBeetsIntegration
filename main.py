@@ -146,8 +146,7 @@ if __name__ == "__main__":
     # In case some tracks were added to Traktor playlists but not yet imported in beets, let's keep them by merging
     existing_playlists = traktor.list_auto_generated_playlists(
         traktor_collection, auto_generated_playlists_directory_name)
-    merged_playlists = merge_playlists(generated_playlists, existing_playlists)
-    # TODO: only merge tracks that are not imported in beets
+    merged_playlists = merge_playlists(beets_tracks, generated_playlists, existing_playlists)
 
     print("Found %s auto-generated playlists" % len(generated_playlists))
     print("Writing auto-generated playlists to Traktor in folder '%s'" % auto_generated_playlists_directory_name)
