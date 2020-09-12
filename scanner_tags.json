@@ -1,6 +1,5 @@
 {
     "_playlists": [
-        ["susu"],
         ["genre2"],
         ["scratch"],
         ["lead"],
@@ -8,7 +7,8 @@
         ["mood"],
         ["energy"],
         ["genre2", "energy"],
-        ["genre2", "mood"]
+        ["genre2", "mood"],
+        ["susu"]
     ],
     "energy": ["1", "2", "3", "4", "5"],
     "rating": ["1", "2", "3", "4", "5"],
