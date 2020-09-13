@@ -37,6 +37,7 @@ pipenv install
 ## Configuration
 ```
 cp locations.json.template locations.json
+cp scanner_tags.json.template scanner_tags.json
 ```
 
 1. Edit `locations.json` to specify where your `Traktor` `collection.nml` file is etc.
