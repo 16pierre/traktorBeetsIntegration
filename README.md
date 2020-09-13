@@ -6,19 +6,21 @@ and Traktor that helps manage Traktor libraries.
 **Warning:** this was developped and used only on MacOs, I doubt this project is compatible with Windows. 
 This project comes with no guarantees: I recommend backing-up your files.
 
+![Picture: summary of features](./images/summary.png)
+
 Core features (detailed in [Features](#Features)):
 - enable usage of custom tags in Traktor through auto-generated playlists
-- write comments on Traktor tracks that list custom tags
-- utils to import Traktor library into Beets' library
+- auto-generate comments on Traktor tracks to help you visualize custom tags
 - sync tags between Traktor and Beets
+- utils to easily import your Traktor library into Beets' library
+- utils to prompt pre-configured custom tags to easily tag your tracks
+- auto-import "m3u" playlists folders in Traktor (useful when using the `smartPlaylists` Beets plugin)
 
 Planned features:
 - multi-value metadata support
 - create an issue if you have a feature request ;)
 
-To better understand how this project was born, see the [Motivations section](#Motivations).
-
-Feel free to contribute with PRs/issues !
+Feel free to contribute with PRs/issues ! 
 
 ## See it in action !
 
@@ -151,54 +153,3 @@ and update `Traktor` library to point to `beet_library` instead of the original 
 9. You can reopen Traktor now :)
  
 
-## Motivations
-
-If you take a look at Native Instrument's forum, you'll find that a lot of people are frustrated 
-by Traktor filesystem. So am I. I do love Traktor, but there are still some major painpoints:
-- **Traktor doesn't handle custom metadata**. 
-- **Traktor tends to get messy when sorting genres, artists etc.**
-
-
-#### Frustrated by my previous workflow
-
-My typical workflow is to sort tracks by `genre` and by `energy` (which I rate from 1 to 5).
-
-Since Traktor doesn't handle custom metadata, I used to create a playlist for each energy level.
-
-But then the playlists were messy: they included a whole bunch of different genres, 
-and genres are annoying to filter in Traktor.
-So I started creating playlists with `genre + energy` (example: `disco energy 5`, `house energy 3`...)
-
-However this started to become very frustrating for multiple reasons:
-- I wanted to add new tags, like the `mood` of a song (example: `joyful`, `dark` etc.)
-But then I'd need to move tracks between playlists, and since playlists are not synced, creating something
-like `genre: techno mood: joyful` + `genre: techno mood:dark` requires too much work
-- As a software engineer, I like clean data storage: replacing metadata by a hacky playlist system 
-is just not a satisfying way to handle this issue on the long term. 
-I prefer organizing my library independently of the DJ Software I'm using, this is more robust.
-
-And then I discovered [Beets](https://github.com/beetbox/beets), and it solved all more problems. 
-
-#### Why use beets
-
-`Beets` is a great open-source music library management software. Some main beets features:
-- it helps you tag your songs by identifying your songs on online databases
-- it centralizes your music files in one folder and it automatically keeps it organized
-- it has great support for custom tags, and helps you list/modify tags easily through a CLI (`beet ls`, `beet modify`)
-- it has a whole bunch of cool plugins (like the `smart playlists` plugin that automatically 
-generates `m3u` playlists by filtering metadata)
-- you can easily write your own code to interact with `Beets` (like I did) 
-
-However, using `Beets` + `Traktor` was not always easy:
-- you need to migrate your library from `Traktor` to `Beets`. 
-Since it's best to move files to beets' centralized folder, you need to relocate all files in your 
-Traktor library so that they point to the `Beets` folder
-- using `Beets`'s metadata in `Traktor` is easy (you can simply generate `smart playlists`), 
-but there was no support for the `Traktor` -> `Beets` export: 
-say I want to rate a song 5 stars in Traktor, how do I write this metadata in `Beets` ?
-- without a project like this one, when adding new tracks, 
-you need to first import them in `Beets` before using them in `Traktor`, which is extremely annoying. 
-
-So that's how I decided to code this project, it solves these issues by providing 
-a decent sync between `Beets` and `Traktor`, so that you can do most of your library management in `Traktor`,
-and worry about `Beets` later.
