@@ -7,7 +7,7 @@
         ["mood"],
         ["energy"],
         ["genre2", "energy"],
-        ["genre2", "mood"],
+        ["genre2", "mood"]
     ],
     "energy": ["1", "2", "3", "4", "5"],
     "rating": ["1", "2", "3", "4", "5"],
@@ -17,5 +17,5 @@
                "Techno", "Acid", "Dance", "Hip Hop", "Rap", "Dubstep", "Progressive", "RokTek", "Chillax", "Ghetto", "Psy", "Trance", "Synthwave"],
     "vocal": ["yes", "no"],
     "lead": ["vocal", "drums", "synth", "piano", "sax", "bass", "chords"],
-    "scratch": ["yes", "no"],
+    "scratch": ["yes", "no"]
 }
