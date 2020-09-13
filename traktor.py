@@ -256,22 +256,30 @@ def update_tracks_locations(
             count += 1
             print("TRAKTOR: Replaced %s by %s" % (path, new_path))
 
-    if collection.nml.playlists and collection.nml.playlists.node.subnodes:
-        for subnode in collection.nml.playlists.node.subnodes.node:
-            if subnode.subnodes and subnode.subnodes.node:
-                for playlist in subnode.subnodes.node:
-                    if playlist.playlist and playlist.playlist.entry:
-                        for t in playlist.playlist.entry:
-                            if not t.primarykey or not t.primarykey.key:
-                                continue
-                            p = traktor_absolute_path_to_pathlib_path(t.primarykey.key)
-                            if p in old_to_new_locations:
-                                new_path = old_to_new_locations[path]
-                                t.primarykey.key = pathlib_path_to_traktor_absolute_path(new_path, volume)
-                                print("TRAKTOR PLAYLIST: Replaced %s by %s" % (path, new_path))
+    if collection.nml.playlists and collection.nml.playlists.node:
+        update_tracks_locations_in_playlists(collection.nml.playlists.node, old_to_new_locations, volume)
+
 
     _save_collection(collection)
     print("Relocated %s tracks in Traktor" % count)
+
+def update_tracks_locations_in_playlists(
+        node: TraktorModels.Nodetype,
+        old_to_new_locations: Dict[Path, Path],
+        volume: str):
+    if node.subnodes and node.subnodes.node:
+        for n in node.subnodes.node:
+            update_tracks_locations_in_playlists(n, old_to_new_locations, volume)
+
+    if node.playlist and node.playlist.entry:
+        for t in node.playlist.entry:
+            if not t.primarykey or not t.primarykey.key:
+                continue
+            p = traktor_absolute_path_to_pathlib_path(t.primarykey.key.lower())
+            if p in old_to_new_locations:
+                new_path = old_to_new_locations[p]
+                t.primarykey.key = pathlib_path_to_traktor_absolute_path(new_path, volume)
+                print("TRAKTOR PLAYLIST: Replaced %s by %s" % (p, new_path))
 
 
 if __name__ == "__main__":
