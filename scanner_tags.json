@@ -8,16 +8,14 @@
         ["energy"],
         ["genre2", "energy"],
         ["genre2", "mood"],
-        ["susu"]
     ],
     "energy": ["1", "2", "3", "4", "5"],
     "rating": ["1", "2", "3", "4", "5"],
-    "mood": ["joyful", "dark", "chill", "futurist", "energy", "nostalgy"],
+    "mood": ["joyful", "dark", "chill", "futurist", "energy", "nostalgy", "test"],
     "loop": ["yes", "no"],
     "genre2": ["Soul", "Funk", "Disco", "House", "Tech House", "Minimal", "Deep House", "Tropical", "Glitch", "Jungle", "Big room",
                "Techno", "Acid", "Dance", "Hip Hop", "Rap", "Dubstep", "Progressive", "RokTek", "Chillax", "Ghetto", "Psy", "Trance", "Synthwave"],
     "vocal": ["yes", "no"],
     "lead": ["vocal", "drums", "synth", "piano", "sax", "bass", "chords"],
     "scratch": ["yes", "no"],
-    "susu": ["yes", "no"]
 }
