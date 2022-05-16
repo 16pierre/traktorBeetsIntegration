@@ -7,11 +7,11 @@ verify_ssl = true
 
 [packages]
 beets = "*"
-traktor-nml-utils = "==2.0.6"
 Unidecode = "*"
+traktor-nml-utils = {git = "https://github.com/16pierre/traktor-nml-utils.git", editable = true, ref = "qp/fix_3.4"}
 
 [requires]
-python_version = "3.8"
+python_version = "3.9.1"
 
 [scripts]
 scan = "python scanner.py"
