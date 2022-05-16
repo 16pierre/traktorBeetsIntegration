@@ -3,3 +3,5 @@ __pycache__
 locations.json
 scanner_tags.json
 .idea
+.DS_Store
+*.log
