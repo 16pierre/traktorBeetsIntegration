@@ -228,7 +228,7 @@ def get_tracks(
                     elif tags[tag_key] != tag_value:
                         # Conflict between playlists, this means the user has placed the track in multiple playlists
                         # To see which tags are the previous/new values, let's check the comment
-                        if tags[tag_key] in comment and \
+                        if comment is not None and tags[tag_key] in comment and \
                                 (tag_value not in comment or len(tag_value) < len(tags[tag_key])):
                             tags[tag_key] = tag_value
 
